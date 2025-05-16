@@ -140,8 +140,6 @@ app.get("/signup", (req, res) => {
 app.post("/signup", async (req, res) => {
     const { username, email, password, confirmPassword } = req.body
 
-    console.log(username, email, password, confirmPassword)
-
     if (password !== confirmPassword) {
         return res.render("register.ejs",
             {
@@ -152,18 +150,20 @@ app.post("/signup", async (req, res) => {
     }
 
     try {
-        const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email])
+        const checkResult = await db.query("SELECT 1 FROM users WHERE email = $1 OR username = $2", [email, username])
 
         if (checkResult.rows.length > 0) {
-            console.log("Email already exists")
-            req.flash("error_msg", "Email already exists");
+            console.log("Email or username already exists")
+            req.flash("error_msg", "Email or username already exists");
             return res.redirect("/signup");
         }
 
         const passwordHash = await bcrypt.hash(password, saltRounds);
         const userID = uuidv4();
 
-        await db.query("INSERT INTO users (email, password, user_id, username) VALUES ($1, $2, $3, $4)", [email, passwordHash, userID, username])
+        await db.query("INSERT INTO users (email, password_hash, username, user_id) VALUES ($1, $2, $3, $4)", [email, passwordHash, username, userID])
+
+        console.log("User inserted with ID:", userID)
 
         const user = {email, username, user_id: userID};
 
