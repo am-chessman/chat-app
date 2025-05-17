@@ -2,15 +2,15 @@ import express from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import bodyParser from "body-parser";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
+// import { dirname } from "path";
+// import { fileURLToPath } from "url";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import session from "express-session";
 import pg from "pg";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
-import { spawnSync } from 'child_process';
+// import { spawnSync } from 'child_process';
 import crypto from 'crypto';
 import flash from 'connect-flash'
 
@@ -57,41 +57,33 @@ app.use((req, res, next) => {
     next();
 })
 
-passport.use(
-    new Strategy(
-        {
-            usernameField: 'email',
-            passReqToCallback: true
-        },
-        async function verify(req, email, password, done) {
-            try {
-                const result = await db.query("SELECT * FROM users WHERE email = $1", [email])
+passport.use(new Strategy( {passReqToCallback: true}, async function verify(req, username, password, cb) {
+        try {
+            const result = await db.query("SELECT * FROM users WHERE username = $1", [username])
 
-                // console.log(result.rows[0])
-
-                if (result.rows.length === 0) {
-                    req.flash('error_msg', 'Invalid email or password');
-                    return done(null, false)
-                }
-
-                const user = result.rows[0]
-
-                const passwordMatch = await bcrypt.compare(password, user.password)
-
-                if (!passwordMatch) {
-                    req.flash('error_msg', 'Invalid email or password');
-                    return done(null, false);
-                }
-
-                return done(null, user);
-
+            if (result.rows.length === 0) {
+                req.flash('error_msg', 'Invalid email or password');
+                return cb(null, false)
             }
-            catch(err) {
-                console.error('Authentication error', err);
-                return done(err);
+
+            const user = result.rows[0]
+
+            const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+            if (!passwordMatch) {
+                req.flash('error_msg', 'Invalid email or password');
+                return cb(null, false);
             }
+
+            return cb(null, user);
+
         }
-    )
+        catch(err) {
+            console.error('Authentication error', err);
+            // return cb(null, false);
+        }
+    }
+)
 );
 
 passport.serializeUser((user, cb) => {

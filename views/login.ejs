@@ -24,7 +24,7 @@
         </div>
         <input type="submit" value="Login">
         <%if (locals) {%>
-            <p><%= error_msg %></p>
+            <p class="error-field"><%= error_msg %></p>
         <%}%>
     </form>
 </body>
@@ -32,8 +32,7 @@
 <script>
     const errorMsgElement = document.querySelector('.error-field')
     setTimeout(() => {
-        if(errorMsgElement)
-        {
+        if(errorMsgElement) {
             errorMsgElement.remove();
         }
     }, 3000)

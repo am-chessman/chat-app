@@ -40,6 +40,7 @@ form {
         font-family: inherit;
         cursor: pointer;
         background-color: #d2d1d1;
+        border: solid 1px slateblue;
     }
 
     .pass-reset-and-signup-btn {
@@ -65,10 +66,6 @@ form {
 
 
 @media only screen and (max-width: 600px) {
-    /* body {
-        background-color: lightblue;
-    } */
-
     form {
 
         input:not(:last-child) {
@@ -107,14 +104,8 @@ form {
 .error-field {
     position: absolute;
     bottom: 18%;
-    background-color: #8b8b8b;
-    color: #fff;
-    height: 30px;
-    width: 100px;
-    border-radius: 15px;
-    font-size: .8rem;
-    display: flex;
-    align-items: center;
+    color: #da0f0f;
+    font-size: .95em;
 
     p {
         text-align: center;
