@@ -2,24 +2,19 @@ import express from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import bodyParser from "body-parser";
-// import { dirname } from "path";
-// import { fileURLToPath } from "url";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import session from "express-session";
 import pg from "pg";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
-// import { spawnSync } from 'child_process';
 import crypto from 'crypto';
 import flash from 'connect-flash'
 
 const app = express();
-// const hostname = '192.168.1.125';
 const port = 3000;
 const server = createServer(app);
 const io = new Server(server);
-// const __dirname = dirname(fileURLToPath(import.meta.url));
 const db = new pg.Client({
     user: "postgres",
     password: "chessman",
@@ -30,9 +25,9 @@ const db = new pg.Client({
 const saltRounds = 10;
 
 db.connect()
-    .then(() => {
-        console.log("Connected to database")
-    })
+    // .then(() => {
+    //     console.log("Connected to database")
+    // })
     .catch((error) => {
         console.log("Error connecting to database", error)
     })
@@ -40,14 +35,18 @@ db.connect()
 app.use(express.static("public"))
 app.set("view engine", "ejs")
 app.use(bodyParser.urlencoded({ extended:true }))
-app.use(session({
+const sessionMiddleware = session({
     secret: "SECRETWORD",
     resave: false,
     saveUninitialized: true,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 14
     }
-}));
+});
+app.use(sessionMiddleware);
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next)
+})
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash())
@@ -80,7 +79,6 @@ passport.use(new Strategy( {passReqToCallback: true}, async function verify(req,
         }
         catch(err) {
             console.error('Authentication error', err);
-            // return cb(null, false);
         }
     }
 )
@@ -103,9 +101,9 @@ app.post("/",
         successRedirect: "/home",
         failureRedirect: "/",
         failureFlash: true
-}));
+    })
+);
 
-var userIdQuery = 0;
 app.get("/home", async(req, res) => {
     if (req.isAuthenticated()) {
         req.flash('welcome_msg', "Welcome back")
@@ -175,9 +173,12 @@ app.post("/signup", async (req, res) => {
 })
 
 io.on('connect', (socket) => {
-    console.log('Connected');
+    // console.log('Connected');
+    const session = socket.request.session
+    const senderId = session?.passport?.user?.user_id
+
     socket.on('message', (msg) => {
-        io.emit('message', msg); 
+        io.emit('message', msg);
         const messageContent = msg.message;
 
         // Function to generate RSA keys (public and private)
@@ -278,19 +279,10 @@ io.on('connect', (socket) => {
 
         async function appendToDbms() {
             try {
-                if (userIdQuery && userIdQuery.rows && userIdQuery.rows.length > 0) {
-                    const senderIDQuery = await db.query(
-                        "SELECT user_id FROM users WHERE email = $1",
-                        [userIdQuery.rows[0].email]
-                    );
-                    if (senderIDQuery.rows && senderIDQuery.rows.length > 0) {
-                        const senderID = senderIDQuery.rows[0].user_id;
-                        await db.query("INSERT INTO messages (sender_id, message) VALUES ($1, $2)", [senderID, messageContent]);
-                    } else {
-                        console.log("No sender ID found for the given email.");
-                    }
+                if (messageContent.length > 0) {
+                    await db.query("INSERT INTO messages (sender_id, message) VALUES ($1, $2)", [senderId, messageContent]);
                 } else {
-                    console.log("userIdQuery is not populated or has no rows.");
+                    console.log("No sender ID found for the given email.");
                 }
             } catch (error) {
                 console.error("Error fetching sender ID:", error);
@@ -304,5 +296,5 @@ io.on('connect', (socket) => {
 });
 
 server.listen(port, () => {
-    console.log(`Server up and listening on port ${port}`);
+    console.log(`App running on port ${port}`);
 });
