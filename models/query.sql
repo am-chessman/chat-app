@@ -1,3 +1,6 @@
+create database users;
+create database messages;
+
 create table users(
                       id serial primary key,
                       email varchar(100) not null,
