@@ -10,7 +10,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 const Layout = async ({children}: {children: ReactNode}) => {
     const session = await auth()
-    if (session) redirect ('/')
+    if (session) redirect ('/join-room')
 
     return (
         <main className={`w-full h-screen flex bg-slate-900  justify-center items-center ${jetBrainsMono.className}`}>

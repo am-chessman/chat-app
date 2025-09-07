@@ -7,7 +7,17 @@ import bcrypt from "bcryptjs"
 import {signInSchema} from "@/lib/zod";
 import {ZodError} from "zod";
 
-export const { handlers, signIn, auth } = NextAuth({
+declare module "next-auth" {
+    interface Session {
+        username?: string;
+    }
+
+    interface User {
+        username?: string;
+    }
+}
+
+export const { handlers, signIn, auth, signOut } = NextAuth({
     session: {
         strategy: "jwt",
     },
@@ -26,8 +36,6 @@ export const { handlers, signIn, auth } = NextAuth({
               }
             },
             async authorize(credentials) {
-                console.log("➡️ [authorize] called with:", credentials)
-
                 try {
                    if(!credentials?.email || !credentials?.password) {
                        console.log("❌ Missing email or password in credentials")
@@ -42,8 +50,6 @@ export const { handlers, signIn, auth } = NextAuth({
                            eq(users.email, email))
                        .limit(1);
 
-                   console.log(userResult);
-
                    if(userResult.length === 0) return null;
 
                    const foundUser = userResult[0];
@@ -51,11 +57,7 @@ export const { handlers, signIn, auth } = NextAuth({
                    const isPasswordValid = await bcrypt.compare(password, foundUser.password);
 
                    if(!isPasswordValid) {
-                       console.log("Invalid credentials")
                        return null;
-                   }
-                   else {
-                          console.log("Valid credentials")
                    }
 
                    return {
@@ -84,6 +86,7 @@ export const { handlers, signIn, auth } = NextAuth({
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
+                token.name = user.username;
             }
 
             return token;
@@ -93,9 +96,11 @@ export const { handlers, signIn, auth } = NextAuth({
             if(session.user) {
                 session.user.id = token.id as string;
                 session.user.email = token.email as string;
+                session.user.username = token.name as string;
             }
 
             return session;
-        }
+        },
+
     }
 })

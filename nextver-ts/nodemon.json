@@ -1,0 +1,5 @@
+{
+  "watch": ["server.mts"],
+  "exec": "ts-node server.mts",
+  "ext": "ts tsx js json"
+}

@@ -27,11 +27,11 @@ interface Props<T extends FieldValues> {
 }
 
 const AuthForm = <T extends FieldValues>({
-        type,
-        schema,
-        defaultValues,
-        onSubmit,
-    }: Props<T>) => {
+                                             type,
+                                             schema,
+                                             defaultValues,
+                                             onSubmit,
+                                         }: Props<T>) => {
     const router = useRouter()
     const isSignIn = type === "SIGN_IN"
     const form: UseFormReturn<T> = useForm({
@@ -43,7 +43,7 @@ const AuthForm = <T extends FieldValues>({
         const result = await onSubmit(data)
         if(result.success) {
             toast.success(isSignIn ? "Signed in successfully!" : "Account created successfully!", {duration: 2000})
-            router.push("/")
+            router.push("/join-room")
         }
         else {
             toast.error(result.error || "Something went wrong. Please try again.", {duration: 2000})
@@ -58,7 +58,7 @@ const AuthForm = <T extends FieldValues>({
                     {/* Header section */}
                     <div className="text-center mb-8">
                         <div className="mb-4">
-                            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-slate-600 rounded-full mx-auto flex items-center justify-center mb-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-slate-400 to-slate-700 rounded-full mx-auto flex items-center justify-center mb-4">
                                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                 </svg>
@@ -92,7 +92,7 @@ const AuthForm = <T extends FieldValues>({
                                                     type={FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]}
                                                     placeholder={FIELD_PLACEHOLDERS[field.name as keyof typeof FIELD_NAMES]}
                                                     {...field}
-                                                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500/20 rounded-lg h-12 transition-all duration-200"
+                                                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-slate-400 focus:ring-slate-400/20 rounded-lg h-12 transition-all duration-200"
                                                 />
                                             </FormControl>
                                             <FormMessage className="text-red-400 text-xs" />
@@ -104,7 +104,7 @@ const AuthForm = <T extends FieldValues>({
 
                             <Button
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-purple-600 to-slate-600 hover:from-purple-700 hover:to-slate-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] cursor-pointer shadow-lg hover:shadow-purple-500/25 h-12"
+                                className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] cursor-pointer shadow-lg hover:shadow-slate-500/25 h-12"
                             >
                                 {isSignIn ? "Sign In" : "Create Account"}
                             </Button>
@@ -117,7 +117,7 @@ const AuthForm = <T extends FieldValues>({
                             {isSignIn ? "New to Chatwave? " : "Already have an account? "}
                             <Link
                                 href={isSignIn ? "/sign-up" : "/sign-in"}
-                                className="font-semibold text-purple-400 hover:text-purple-300 transition-colors duration-200 underline decoration-purple-400/50 hover:decoration-purple-300/50 cursor-pointer underline-offset-2"
+                                className="font-semibold text-slate-300 hover:text-white transition-colors duration-200 underline decoration-slate-400/50 hover:decoration-white/50 cursor-pointer underline-offset-2"
                             >
                                 {isSignIn ? "Create an account" : "Sign in"}
                             </Link>
@@ -127,8 +127,8 @@ const AuthForm = <T extends FieldValues>({
 
                 {/* Optional decorative elements */}
                 <div className="absolute inset-0 -z-10 overflow-hidden">
-                    <div className="absolute -top-40 -right-32 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
-                    <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-slate-500/10 rounded-full blur-3xl"></div>
+                    <div className="absolute -top-40 -right-32 w-80 h-80 bg-slate-400/10 rounded-full blur-3xl"></div>
+                    <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-slate-600/10 rounded-full blur-3xl"></div>
                 </div>
             </div>
         </div>

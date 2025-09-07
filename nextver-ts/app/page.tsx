@@ -1,15 +1,14 @@
-import { db } from "@/database/drizzle"
-import { users } from "@/database/schema"
+import Chat from "@/components/chatInterface";
+import {auth} from "@/auth";
+import {redirect} from "next/navigation";
 
-export default async function Home() {
-
-    // const data = await db.select().from(users)
-    // console.log(JSON.stringify(data, null, 2))
-    //
+export default async function Home({params}: {params: {page: number}}) {
+    const session = await auth();
+    if(!session) redirect("/sign-in")
+    const page = params.page;
     return (
         <>
-            {/* <SignIn /> */}
-        Home Page
+            <Chat session={session} roomNumber={page} />
         </>
     );
 }

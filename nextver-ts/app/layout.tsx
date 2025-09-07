@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </head>
         <SessionProvider session={session}>
         <body className="m-0 h-screen w-screen flex justify-center font-mono" >
-            { children }
+            { children}
             <Toaster />
         </body>
         </SessionProvider>
