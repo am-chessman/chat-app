@@ -29,11 +29,6 @@ export default function JoinRoomUI() {
         setIsJoining(true);
 
         router.push(`/room/${roomNumber}`);
-
-        setTimeout(() => {
-            console.log(`Joining room: ${roomNumber}`);
-            setIsJoining(false);
-        }, 1000);
     };
 
     const generateRandomRoom = () => {

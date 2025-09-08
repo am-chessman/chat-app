@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import {redirect} from "next/navigation";
 
 interface RoomPageProps {
-    params: { roomNumber: string };
+    params: { roomNumber: string | number };
 }
 
 export default async function RoomPage({ params }: RoomPageProps) {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,7 +15,7 @@ interface Message {
 
 interface ChatInterfaceProps {
     session: Session | null;
-    roomNumber: string;
+    roomNumber: string | number;
 }
 
 export default function ChatInterface({ session, roomNumber }: ChatInterfaceProps) {
@@ -24,6 +24,8 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
     const [messages, setMessages] = useState<Message[]>([]);
     const [joined, setJoined] = useState(false);
     const [messageInput, setMessageInput] = useState("");
+    const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Get current user's name for comparison
     const currentUserName = session?.user?.name || "Anonymous";
@@ -34,7 +36,6 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
         console.log(`User ${socket.id} joined room ${roomNumber}`);
         setJoined(true);
 
-        // Incoming message handler
         socket.on("message", ( data: {room: string, message: string, sender: string} ) => {
             console.log("Room number: ", roomNumber || "No room number");
             setMessages((prev) => [
@@ -52,7 +53,8 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
                 {
                     sender: data.sender,
                     message: data.message
-                }]);
+                }
+            ]);
         });
 
         return () => {
@@ -70,12 +72,36 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
             sender: currentUserName,
         };
 
-        // Emit to server
         socket.emit("message", { ...newMessage, room: roomNumber });
-
-        // Update local state
-        // setMessages((prev) => [...prev, newMessage]);
         setMessageInput("");
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            console.log("Selected file:", file.name);
+            // Handle file upload logic here
+            setShowAttachmentMenu(false);
+        }
+    };
+
+    const handleAttachmentClick = (type: string) => {
+        switch (type) {
+            case 'file':
+                fileInputRef.current?.click();
+                break;
+            case 'image':
+                // Handle image selection
+                console.log("Image attachment clicked");
+                break;
+            case 'camera':
+                // Handle camera access
+                console.log("Camera attachment clicked");
+                break;
+            default:
+                break;
+        }
+        setShowAttachmentMenu(false);
     };
 
     return (
@@ -115,7 +141,12 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
                             const displayName = isCurrentUser ? "You" : msg.sender;
                             const isSystem = msg.sender === "system";
 
+                            const isCurrentUserJoinMessage = isSystem &&
+                                (msg.message.includes(`${currentUserName}`) ||
+                                    msg.message.includes(`${currentUserName}`))
+
                             if (isSystem) {
+                                if(isCurrentUserJoinMessage) return null;
                                 return (
                                     <div key={index} className="flex justify-center">
                                         <div
@@ -139,8 +170,68 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
                 </div>
 
                 {/* Input */}
-                <div className="bg-slate-800/60 border-t border-slate-700/30 p-6 flex-shrink-0">
+                <div className="bg-slate-800/60 border-t border-slate-700/30 p-6 flex-shrink-0 relative">
+                    {/* Attachment Menu */}
+                    {showAttachmentMenu && (
+                        <div className="absolute bottom-20 left-6 bg-slate-700/90 backdrop-blur-xl border border-slate-600/50 rounded-xl shadow-xl p-2 z-10">
+                            <div className="flex flex-col gap-1">
+                                <button
+                                    onClick={() => handleAttachmentClick('file')}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600/50 rounded-lg transition-colors text-slate-200 hover:text-white"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    <span className="text-sm">File</span>
+                                </button>
+                                <button
+                                    onClick={() => handleAttachmentClick('image')}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600/50 rounded-lg transition-colors text-slate-200 hover:text-white"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span className="text-sm">Image</span>
+                                </button>
+                                <button
+                                    onClick={() => handleAttachmentClick('camera')}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600/50 rounded-lg transition-colors text-slate-200 hover:text-white"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span className="text-sm">Camera</span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Hidden file input */}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileSelect}
+                        accept="*/*"
+                    />
+
                     <form onSubmit={handleSend} className="flex items-center gap-3">
+                        {/* Attachment button */}
+                        <button
+                            type="button"
+                            onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
+                            className={`${
+                                showAttachmentMenu
+                                    ? 'bg-slate-600 rotate-45'
+                                    : 'bg-slate-700/50 hover:bg-slate-600/50'
+                            } border border-slate-600/50 text-white p-3 rounded-xl transition-all duration-200 transform hover:scale-105`}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                        </button>
+
                         <input
                             type="text"
                             value={messageInput}
@@ -148,6 +239,15 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
                             placeholder="Send a message..."
                             className="flex-1 bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-400/20 rounded-xl px-4 py-3 transition-all duration-200 focus:outline-none"
                         />
+
+                        {/* Click outside to close menu */}
+                        {showAttachmentMenu && (
+                            <div
+                                className="fixed inset-0 z-0"
+                                onClick={() => setShowAttachmentMenu(false)}
+                            ></div>
+                        )}
+
                         <button
                             type="submit"
                             className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white p-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-slate-500/25"

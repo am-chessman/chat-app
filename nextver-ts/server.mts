@@ -28,7 +28,7 @@ app.prepare().then(() => {
                 const {room, username} = data;
                 socket.join(room);
                 console.log(`Username: ${username} with ID: ${socket.id} joined room: ${room}`);
-                socket.to(room).emit("user_joined", {sender: "system", message: `${username} joined the room`});
+                io.to(room).emit("user_joined", {sender: "system", message: `${username} joined the room`});
             })
 
         socket.on("message", (data: {room: string, message: string, sender: string}) => {
