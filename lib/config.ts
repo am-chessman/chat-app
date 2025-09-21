@@ -1,5 +1,3 @@
-import { env } from "process";
-
 const config = {
     env: {
         AUTH_SECRET: process.env.AUTH_SECRET!,

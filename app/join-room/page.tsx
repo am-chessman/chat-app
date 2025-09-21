@@ -1,5 +1,5 @@
 import React from 'react'
-import JoinRoomUI from "@/components/chatroomInterface";
+import JoinRoomUI from "@/components/joinRoomInterface";
 
 const Page = () => {
     return (

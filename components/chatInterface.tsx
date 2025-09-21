@@ -22,7 +22,7 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
     console.log("Room number in ChatInterface:", roomNumber);
 
     const [messages, setMessages] = useState<Message[]>([]);
-    const [joined, setJoined] = useState(false);
+    // const [joined, setJoined] = useState(false);
     const [messageInput, setMessageInput] = useState("");
     const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +34,7 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
     useEffect(() => {
         socket.emit("join-room", {room: roomNumber, username: currentUserName});
         console.log(`User ${socket.id} joined room ${roomNumber}`);
-        setJoined(true);
+        // setJoined(true);
 
         socket.on("message", ( data: {room: string, message: string, sender: string} ) => {
             console.log("Room number: ", roomNumber || "No room number");

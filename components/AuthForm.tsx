@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -34,7 +33,7 @@ const AuthForm = <T extends FieldValues>({
                                          }: Props<T>) => {
     const router = useRouter()
     const isSignIn = type === "SIGN_IN"
-    const form: UseFormReturn<T> = useForm({
+    const form = useForm<T>({
         resolver: zodResolver(schema),
         defaultValues: defaultValues as DefaultValues<T>,
     })
