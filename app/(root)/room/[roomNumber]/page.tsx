@@ -3,20 +3,18 @@ import { auth } from "@/auth";
 import {redirect} from "next/navigation";
 
 interface RoomPageProps {
-    params: { roomNumber: string | number};
+    params: { roomNumber: string };
 }
 
 export default async function RoomPage({ params }: RoomPageProps) {
     const session = await auth();
-    const { roomNumber } = await params;
+    const { roomNumber } = params;
 
-    if (!session) redirect("/sign-in")
+    if (!session) redirect("/sign-in");
 
-    if (!roomNumber || roomNumber === '') {
+    if (!roomNumber) {
         redirect("/join-room");
     }
 
-    return (
-            <Chat session={session} roomNumber={roomNumber} />
-    );
+    return <Chat session={session} roomNumber={roomNumber} />;
 }
