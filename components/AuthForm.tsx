@@ -50,37 +50,35 @@ const AuthForm = <T extends FieldValues>({
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
-                    <div className="text-center mb-8">
-                        <div className="mb-4">
-                            <div className="w-16 h-16 bg-gradient-to-br from-slate-400 to-slate-700 rounded-full mx-auto flex items-center justify-center mb-4">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                            </div>
+        <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-8 sm:py-12">
+            <div className="mx-auto flex w-full max-w-md items-center justify-center">
+                <div className="w-full rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+                    <div className="mb-8 text-center">
+                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600/20 ring-1 ring-indigo-300/20">
+                            <svg className="h-7 w-7 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
                         </div>
-                        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                            {isSignIn ? "Welcome back to Chatwave" : "Create your Chatwave account"}
+                        <h1 className="mb-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                            {isSignIn ? "Welcome back" : "Create your account"}
                         </h1>
-                        <p className="text-slate-300 text-sm leading-relaxed">
+                        <p className="text-sm leading-relaxed text-slate-300">
                             {isSignIn
-                                ? "Where Every Message Creates Ripples - Join the ChatWave Community"
-                                : "Join Chatwave and Ride the Wave of Conversations"
+                                ? "Sign in and continue your conversations."
+                                : "Join ChatWave and start chatting in seconds."
                             }
                         </p>
                     </div>
 
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
                             {Object.keys(defaultValues).map((field) => (
                                 <FormField
                                     control={form.control}
                                     name={field as Path<T>}
                                     render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-slate-200 font-medium">
+                                            <FormLabel className="text-sm font-medium text-slate-200">
                                                 {FIELD_NAMES[field.name as keyof typeof FIELD_NAMES]}
                                             </FormLabel>
                                             <FormControl>
@@ -89,10 +87,10 @@ const AuthForm = <T extends FieldValues>({
                                                     type={FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]}
                                                     placeholder={FIELD_PLACEHOLDERS[field.name as keyof typeof FIELD_NAMES]}
                                                     {...field}
-                                                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-slate-400 focus:ring-slate-400/20 rounded-lg h-12 transition-all duration-200"
+                                                    className="h-12 rounded-xl border-slate-600 bg-slate-800 text-white placeholder:text-slate-400 focus:border-indigo-400 focus:ring-indigo-400/20"
                                                 />
                                             </FormControl>
-                                            <FormMessage className="text-red-400 text-xs" />
+                                            <FormMessage className="text-xs text-red-300" />
                                         </FormItem>
                                     )}
                                     key={field}
@@ -101,30 +99,30 @@ const AuthForm = <T extends FieldValues>({
 
                             <Button
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] cursor-pointer shadow-lg hover:shadow-slate-500/25 h-12"
+                                className="h-12 w-full rounded-xl bg-indigo-600 font-semibold text-white transition-colors hover:bg-indigo-500"
                             >
-                                {isSignIn ? "Sign In" : "Create Account"}
+                                {isSignIn ? "Sign in" : "Create account"}
                             </Button>
                         </form>
                     </Form>
 
-                    <div className="mt-8 text-center">
-                        <p className="text-slate-300 text-sm">
-                            {isSignIn ? "New to Chatwave? " : "Already have an account? "}
+                    <div className="mt-7 text-center">
+                        <p className="text-sm text-slate-300">
+                            {isSignIn ? "New to ChatWave? " : "Already have an account? "}
                             <Link
                                 href={isSignIn ? "/sign-up" : "/sign-in"}
-                                className="font-semibold text-slate-300 hover:text-white transition-colors duration-200 underline decoration-slate-400/50 hover:decoration-white/50 cursor-pointer underline-offset-2"
+                                className="font-semibold text-indigo-300 underline underline-offset-2 transition-colors hover:text-indigo-200"
                             >
                                 {isSignIn ? "Create an account" : "Sign in"}
                             </Link>
                         </p>
                     </div>
                 </div>
+            </div>
 
-                <div className="absolute inset-0 -z-10 overflow-hidden">
-                    <div className="absolute -top-40 -right-32 w-80 h-80 bg-slate-400/10 rounded-full blur-3xl"></div>
-                    <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-slate-600/10 rounded-full blur-3xl"></div>
-                </div>
+            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <div className="absolute -top-40 -right-32 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
+                <div className="absolute -bottom-40 -left-32 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
             </div>
         </div>
     )
