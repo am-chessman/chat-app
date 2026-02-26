@@ -19,7 +19,6 @@ interface ChatInterfaceProps {
 }
 
 export default function ChatInterface({ session, roomNumber }: ChatInterfaceProps) {
-    console.log("Room number in ChatInterface:", roomNumber);
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [messageInput, setMessageInput] = useState("");
@@ -31,11 +30,9 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
 
     // Join room on mount
     useEffect(() => {
-        socket.emit("join-room", {room: roomNumber, username: currentUserName});
-        console.log(`User ${socket.id} joined room ${roomNumber}`);
+        socket.emit("join-room", { room: roomNumber, username: currentUserName });
 
-        socket.on("message", ( data: {room: string, message: string, sender: string} ) => {
-            console.log("Room number: ", roomNumber || "No room number");
+        socket.on("message", (data: { room: string; message: string; sender: string }) => {
             setMessages((prev) => [
                 ...prev,
                 {
@@ -59,7 +56,7 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
             socket.off("message");
             socket.off("user_joined");
         };
-    }, [roomNumber, session, currentUserName]);
+    }, [roomNumber, currentUserName]);
 
     const handleSend = (e: React.FormEvent) => {
         e.preventDefault();
@@ -133,7 +130,13 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
                         <div className="absolute bottom-20 right-16 w-40 h-40 bg-slate-600 rounded-full blur-3xl"></div>
                     </div>
 
-                    <div className="h-full overflow-y-auto p-6 space-y-4">
+                    <div className="h-full overflow-y-auto p-6 space-y-4" aria-live="polite" aria-label="Chat messages">
+                        {messages.length === 0 && (
+                            <div className="flex h-full items-center justify-center text-slate-400 text-sm">
+                                No messages yet. Say hello 👋
+                            </div>
+                        )}
+
                         {messages.map((msg, index) => {
                             const isCurrentUser = msg.sender === currentUserName;
                             const displayName = isCurrentUser ? "You" : msg.sender;
@@ -218,6 +221,8 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
                         {/* Attachment button */}
                         <button
                             type="button"
+                            aria-label="Toggle attachment options"
+                            aria-expanded={showAttachmentMenu}
                             onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
                             className={`${
                                 showAttachmentMenu
@@ -232,6 +237,7 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
 
                         <input
                             type="text"
+                            aria-label="Message input"
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
                             placeholder="Send a message..."
@@ -248,6 +254,7 @@ export default function ChatInterface({ session, roomNumber }: ChatInterfaceProp
 
                         <button
                             type="submit"
+                            aria-label="Send message"
                             className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white p-3 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-slate-500/25"
                         >
                             <svg viewBox="0 0 24 24" height="20" width="20">

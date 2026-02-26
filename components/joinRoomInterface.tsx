@@ -25,10 +25,11 @@ export default function JoinRoomUI() {
     const router = useRouter()
 
     const handleJoinRoom = async () => {
-        if (!roomNumber.trim()) return;
-        setIsJoining(true);
+        const normalizedRoom = roomNumber.trim();
+        if (!normalizedRoom) return;
 
-        router.push(`/room/${roomNumber}`);
+        setIsJoining(true);
+        router.push(`/room/${normalizedRoom}`);
     };
 
     const generateRandomRoom = () => {
@@ -75,9 +76,10 @@ export default function JoinRoomUI() {
                                     <Input
                                         id="roomNumber"
                                         type="text"
+                                        inputMode="numeric"
                                         placeholder="123456"
                                         value={roomNumber}
-                                        onChange={(e) => setRoomNumber(e.target.value)}
+                                        onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ""))}
                                         onKeyDown={handleKeyPress}
                                         className="bg-gray-700/60 border-gray-600/40 text-white placeholder:text-gray-400 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20 pl-10"
                                         maxLength={6}
@@ -132,7 +134,7 @@ export default function JoinRoomUI() {
                         <div className="space-y-3">
                             <h3 className="text-sm font-medium text-gray-300">Recent Rooms</h3>
                             <div className="space-y-2">
-                                {['1234', '7890', '3456'].map((room) => (
+                                {["123456", "789012", "345678"].map((room) => (
                                     <button
                                         key={room}
                                         onClick={() => setRoomNumber(room)}
