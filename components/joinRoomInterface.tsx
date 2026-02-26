@@ -1,177 +1,151 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
-} from '@/components/ui/card';
-import {
-    Users,
-    Hash,
-    ArrowRight,
-    Plus,
-    MessageCircle
-} from 'lucide-react';
-import {useRouter} from "next/navigation";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ArrowRight, Hash, MessageCircle, Plus, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+const QUICK_ROOMS = ["123456", "789012", "345678"];
 
 export default function JoinRoomUI() {
-    const [roomNumber, setRoomNumber] = useState('');
-    const [isJoining, setIsJoining] = useState(false);
-    const router = useRouter()
+  const [roomNumber, setRoomNumber] = useState("");
+  const [isJoining, setIsJoining] = useState(false);
+  const router = useRouter();
 
-    const handleJoinRoom = async () => {
-        const normalizedRoom = roomNumber.trim();
-        if (!normalizedRoom) return;
+  const handleJoinRoom = async () => {
+    const normalizedRoom = roomNumber.trim();
+    if (!normalizedRoom || isJoining) return;
 
-        setIsJoining(true);
-        router.push(`/room/${normalizedRoom}`);
-    };
+    setIsJoining(true);
+    router.push(`/room/${normalizedRoom}`);
+  };
 
-    const generateRandomRoom = () => {
-        const randomRoom = Math.floor(100000 + Math.random() * 900000);
-        setRoomNumber(randomRoom.toString());
-    };
+  const generateRandomRoom = () => {
+    const randomRoom = Math.floor(100000 + Math.random() * 900000);
+    setRoomNumber(randomRoom.toString());
+  };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && roomNumber.trim() && !isJoining) {
-            handleJoinRoom();
-        }
-    };
+  const canJoin = roomNumber.trim().length > 0 && !isJoining;
 
-    return (
-        <div className="min-h-screen w-full bg-gray-900 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                {/* Main Card */}
-                <Card className="bg-gray-800/60 border-gray-700/50 backdrop-blur-sm">
-                    <CardHeader className="text-center space-y-4">
-                        {/* Icon */}
-                        <div className="w-16 h-16 bg-gray-700 rounded-full mx-auto flex items-center justify-center">
-                            <MessageCircle className="w-8 h-8 text-gray-300" />
-                        </div>
-
-                        <div>
-                            <CardTitle className="text-2xl font-semibold text-white">
-                                Join ChatWave Room
-                            </CardTitle>
-                            <CardDescription className="text-gray-400 mt-2">
-                                Enter a room number to join the conversation
-                            </CardDescription>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="space-y-6">
-                        {/* Join Room Section */}
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <label htmlFor="roomNumber" className="text-sm font-medium text-gray-300">
-                                    Room Number
-                                </label>
-                                <div className="relative">
-                                    <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                    <Input
-                                        id="roomNumber"
-                                        type="text"
-                                        inputMode="numeric"
-                                        placeholder="123456"
-                                        value={roomNumber}
-                                        onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ""))}
-                                        onKeyDown={handleKeyPress}
-                                        className="bg-gray-700/60 border-gray-600/40 text-white placeholder:text-gray-400 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20 pl-10"
-                                        maxLength={6}
-                                    />
-                                </div>
-                            </div>
-
-                            <Button
-                                onClick={handleJoinRoom}
-                                disabled={!roomNumber.trim() || isJoining}
-                                className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 transition-all duration-200"
-                            >
-                                {isJoining ? (
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        Joining...
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4" />
-                                        Join Room
-                                        <ArrowRight className="w-4 h-4" />
-                                    </div>
-                                )}
-                            </Button>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-700"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="bg-gray-800 px-3 text-gray-400">or</span>
-                            </div>
-                        </div>
-
-                        {/* Quick Actions */}
-                        <div className="space-y-3">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={generateRandomRoom}
-                                className="w-full cursor-pointer bg-gray-700/40 border-gray-600/40 text-gray-300 hover:bg-gray-700/60 hover:text-white transition-all duration-200"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Generate Random Room
-                            </Button>
-                        </div>
-
-                        {/* Recent Rooms */}
-                        <div className="space-y-3">
-                            <h3 className="text-sm font-medium text-gray-300">Recent Rooms</h3>
-                            <div className="space-y-2">
-                                {["123456", "789012", "345678"].map((room) => (
-                                    <button
-                                        key={room}
-                                        onClick={() => setRoomNumber(room)}
-                                        className="w-full cursor-pointer text-left p-3 bg-gray-700/30 hover:bg-gray-700/50 rounded-lg border border-gray-600/30 hover:border-gray-600/50 transition-all duration-200 group"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-                                                    <Hash className="w-4 h-4 text-gray-300" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium text-white">Room {room}</p>
-                                                    <p className="text-xs text-gray-400">Last joined 2h ago</p>
-                                                </div>
-                                            </div>
-                                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Footer */}
-                <div className="mt-6 text-center">
-                    <p className="text-sm text-gray-400">
-                        Don&#39;t have a room number?{' '}
-                        <button
-                            onClick={generateRandomRoom}
-                            className="text-blue-400 hover:text-blue-300 underline transition-colors"
-                        >
-                            Create a new room
-                        </button>
-                    </p>
-                </div>
+  return (
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_12%_20%,rgba(79,70,229,0.2),transparent_42%),radial-gradient(circle_at_88%_75%,rgba(14,165,233,0.16),transparent_38%),linear-gradient(180deg,#020617_0%,#0f172a_48%,#020617_100%)] px-4 py-6 sm:py-10">
+      <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900/70 shadow-[0_18px_55px_-25px_rgba(15,23,42,0.95)] backdrop-blur-xl sm:rounded-3xl">
+        <div className="grid min-h-[600px] lg:grid-cols-[1.1fr,1fr]">
+          <aside className="hidden border-r border-slate-700/50 bg-slate-900/70 px-8 py-10 lg:block">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600/20 ring-1 ring-indigo-300/20">
+                <MessageCircle className="h-5 w-5 text-indigo-200" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">ChatWave</p>
+                <h2 className="text-lg font-semibold text-white">Room Lobby</h2>
+              </div>
             </div>
+
+            <p className="max-w-sm text-sm leading-relaxed text-slate-300">
+              Join an existing room with a 6-digit code or generate a new one and share it. Same visual system as the
+              chat room so the flow feels consistent end-to-end.
+            </p>
+
+            <div className="mt-8 space-y-3 rounded-2xl border border-slate-700/60 bg-slate-800/50 p-4">
+              <p className="text-sm font-medium text-slate-100">How it works</p>
+              <ul className="space-y-1 text-xs text-slate-400">
+                <li>• Enter room code to join instantly</li>
+                <li>• Generate and share a fresh room code</li>
+                <li>• Start chatting in realtime with no setup</li>
+              </ul>
+            </div>
+          </aside>
+
+          <section className="px-5 py-6 sm:px-8 sm:py-10">
+            <div className="mb-8 space-y-2 text-center lg:text-left">
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Join room</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Enter your room code</h1>
+              <p className="text-sm text-slate-300">Use a valid 6-digit code or create a new room code now.</p>
+            </div>
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="roomNumber" className="block text-sm font-medium text-slate-200">
+                  Room number
+                </label>
+                <div className="relative">
+                  <Hash className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    id="roomNumber"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="123456"
+                    value={roomNumber}
+                    onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ""))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && canJoin) handleJoinRoom();
+                    }}
+                    className="h-12 border-slate-600 bg-slate-800 pl-10 text-white placeholder:text-slate-400 focus:border-indigo-400 focus:ring-indigo-400/20"
+                    maxLength={6}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleJoinRoom}
+                disabled={!canJoin}
+                className="h-12 w-full bg-indigo-600 font-medium text-white transition-colors hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-400"
+              >
+                {isJoining ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                    Joining room...
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Join room
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                )}
+              </Button>
+
+              <div className="relative py-1">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-700" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase tracking-wide">
+                  <span className="bg-slate-900 px-3 text-slate-400">or</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={generateRandomRoom}
+                className="h-11 w-full border-slate-600 bg-slate-800/60 text-slate-200 hover:bg-slate-700 hover:text-white"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Generate random room code
+              </Button>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Quick fill</p>
+                {QUICK_ROOMS.map((room) => (
+                  <button
+                    key={room}
+                    onClick={() => setRoomNumber(room)}
+                    className="group flex w-full items-center justify-between rounded-xl border border-slate-700 bg-slate-800/40 px-3 py-2.5 text-left transition-colors hover:border-slate-500 hover:bg-slate-800"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-slate-100">Room {room}</p>
+                      <p className="text-xs text-slate-400">Tap to prefill</p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-300" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

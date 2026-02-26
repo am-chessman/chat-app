@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         </head>
         <SessionProvider session={session}>
-        <body className="m-0 h-screen w-screen flex justify-center font-mono" >
+        <body className="m-0 min-h-screen w-full font-mono antialiased" >
             { children}
             <Toaster />
         </body>
