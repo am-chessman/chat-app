@@ -1,8 +1,8 @@
 "use client"
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ZodType } from 'zod'
-import {DefaultValues, useForm, UseFormReturn, SubmitHandler, FieldValues, Path} from 'react-hook-form'
+
+import { DefaultValues, useForm, SubmitHandler, FieldValues, Path, Resolver } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -19,22 +19,22 @@ import { useRouter } from 'next/navigation'
 import {toast} from "sonner"
 
 interface Props<T extends FieldValues> {
-    schema: ZodType<T>;
+    schema: unknown;
     defaultValues: T;
-    onSubmit: (data: T) => Promise<{success: boolean; error?: string}>;
+    onSubmit: (data: T) => Promise<{ success: boolean; error?: string; message?: string }>;
     type: "SIGN_IN" | "SIGN_UP";
 }
 
 const AuthForm = <T extends FieldValues>({
-                                             type,
-                                             schema,
-                                             defaultValues,
-                                             onSubmit,
-                                         }: Props<T>) => {
+    type,
+    schema,
+    defaultValues,
+    onSubmit,
+}: Props<T>) => {
     const router = useRouter()
     const isSignIn = type === "SIGN_IN"
     const form = useForm<T>({
-        resolver: zodResolver(schema),
+        resolver: zodResolver(schema as never) as Resolver<T>,
         defaultValues: defaultValues as DefaultValues<T>,
     })
 
@@ -45,16 +45,14 @@ const AuthForm = <T extends FieldValues>({
             router.push("/join-room")
         }
         else {
-            toast.error(result.error || "Something went wrong. Please try again.", {duration: 2000})
+            toast.error(result.error || result.message || "Something went wrong. Please try again.", {duration: 2000})
         }
     }
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Main form container */}
                 <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
-                    {/* Header section */}
                     <div className="text-center mb-8">
                         <div className="mb-4">
                             <div className="w-16 h-16 bg-gradient-to-br from-slate-400 to-slate-700 rounded-full mx-auto flex items-center justify-center mb-4">
@@ -110,7 +108,6 @@ const AuthForm = <T extends FieldValues>({
                         </form>
                     </Form>
 
-                    {/* Footer link */}
                     <div className="mt-8 text-center">
                         <p className="text-slate-300 text-sm">
                             {isSignIn ? "New to Chatwave? " : "Already have an account? "}
@@ -124,7 +121,6 @@ const AuthForm = <T extends FieldValues>({
                     </div>
                 </div>
 
-                {/* Optional decorative elements */}
                 <div className="absolute inset-0 -z-10 overflow-hidden">
                     <div className="absolute -top-40 -right-32 w-80 h-80 bg-slate-400/10 rounded-full blur-3xl"></div>
                     <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-slate-600/10 rounded-full blur-3xl"></div>
